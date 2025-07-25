@@ -6,3 +6,4 @@ scipy
 requests
 beautifulsoup4
 pytest
+plotly
