@@ -287,7 +287,7 @@ class FatTailStock():
         """
         for ticker in self.tickers:
             lin_returns = self.lin_returns[ticker].dropna()
-            plt.style.use('seaborn-whitegrid')  # Use a clean grid style
+            plt.style.use('seaborn-v0_8-whitegrid')  # Use a clean grid style
             bins = 100  # Use the same number of bins for all subplots
 
             # Create subplots without sharing the y-axis

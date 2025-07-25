@@ -162,7 +162,7 @@ class ModernPortfolioTheory(fts):
 
         return results, w[lowest_risk_indx, :], lowest_risk_indx
 
-    def compute_test_return(self, data_test: pd.DataFrame) -> np.float:
+    def compute_test_return(self, data_test: pd.DataFrame) -> float:
         """
         Computes the potential return on the test data using the w computed from the train data.
 

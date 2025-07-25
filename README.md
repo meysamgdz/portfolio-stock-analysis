@@ -65,8 +65,7 @@ It supports backtesting, risk modeling, simulation-based optimization, and empir
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/financial-portfolio-analysis.git
-cd financial-portfolio-analysis
+git clone [repo-link]
 ```
 2. Install the ``requirements.txt`` using the command: 
 ``pip install -r requirements.txt``.
