@@ -35,7 +35,7 @@ st.markdown("""
 
 st.latex(r"""
 \begin{aligned}
-    &\text{minimize}\ && w^T\Sigma w \\
+    &\text{minimize}\ && w^T\mathbf{C} w \\
     &\text{subject to}\ && \bar{r}w\geq r_{\min}, \\
     &&& \mathbf{1}^T w = 1,\quad w \succeq 0
 \end{aligned}
@@ -43,7 +43,7 @@ st.latex(r"""
 st.markdown("""where
 - $w_i$ denotes **the amount of asset** $i$ held throughout the period,
 - $r_i$ denote the **relative price change of asset** $i$ over the period,
-- and variance $\mathrm{Var}(r) = w^T \Sigma w$
+- and $\mathbf{C}$ is the variance matrix of assets, if assumed uncorrelated, or covariance matrix, if assumed correlated.$
 """)
 
 st.markdown("**NOTE 3**: The conceptual explanations and implementations throughout the code rely on the book "

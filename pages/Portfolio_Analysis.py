@@ -8,13 +8,14 @@ from pages.utils import load_ticker_data
 st.title("🧠 Markowitz Portfolio Analysis")
 
 st.markdown("""
-We run Markowitz-based portfolio optimization for distribution-aware investment, In particular, we solve:""")
+We run Markowitz-based portfolio optimization for distribution-aware investment, In particular, we solve:
+""")
 c1, c2 = st.columns(2)
 with c1:
     st.write("For Normally-distributed Assets:")
     st.latex(r"""
     \begin{aligned}
-        &\text{minimize}\ && w^T\Sigma w \\
+        &\text{minimize}\ && w^T\mathbf{C} w \\
         &\text{subject to}\ && \bar{r}w\geq r_{\min}, \\
         &&& \mathbf{1}^T w = 1,\quad w \succeq 0
     \end{aligned}
@@ -23,12 +24,15 @@ with c2:
     st.write("For Powerlaw-distributed Assets:")
     st.latex(r"""
     \begin{aligned}
-        & \text{minimize} && \Sigma_{i^=1}^n w_i^{\mu}A_i^{\mu}\\
+        & \text{minimize} && \sum_{i^=1}^n w_i^{\mu}A_i^{\mu} + \sum_{i,j} w_i^{\mu/2}\mathbf{C}_{t, ij}w_j^{\mu/2}\\
         &\text{subject to}\ &&\bar{r}w\geq r_{min}, \\
         &&& \mathbf{1}^Tw = 1,\ w\succeq  0.
     \end{aligned}
     """)
-
+st.markdown("""
+**REMARK**: In the implementation, we have used covariance matrix of the past as an estimate of the future, which is 
+questionable as the estimating covariance is very difficult.
+""")
 company_ticker, _, _, tickers = load_ticker_data()
 tickers = company_ticker["ticker"].tolist()
 

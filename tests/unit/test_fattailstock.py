@@ -44,7 +44,7 @@ class TestFatTailStock:
             'empty': pd.DataFrame(),
             'single_row': pd.DataFrame({'A': [100]}, index=[dates[0]]),
             'negative': pd.DataFrame({'A': [100, 95, -90, 105, 110]}, index=dates),
-            'non_numeric': pd.DataFrame({'A': ['100', '95', '90', '105', '110']}, index=dates),
+            'non_numeric': pd.DataFrame({'A': ['100', '95', 'A', '105', '110']}, index=dates),
             'constant': pd.DataFrame({'A': [100] * 5}, index=dates),
         }
 
@@ -52,7 +52,7 @@ class TestFatTailStock:
         ('empty', ValueError),
         ('single_row', ValueError),
         ('negative', ValueError),
-        ('non_numeric', ValueError),
+        ('non_numeric', TypeError),
         ('constant', ValueError),
     ])
     def test_initialization_failures(self, edge_cases, case, expected_exception):

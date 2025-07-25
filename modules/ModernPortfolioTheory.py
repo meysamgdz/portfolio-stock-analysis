@@ -140,9 +140,13 @@ class ModernPortfolioTheory(fts):
         # In the book notation: A = x_min, mu = alpha-1.
         mu_eff, indx = alpha.min() - 1, np.argmin(alpha)  # Smallest exponents dominates when x->\inf
         A_pow_mu = x_min**mu_eff
+
         # Scale the tail for the total (Gaussian + powerlaw) to sum to 1
         tail_tot_prob = norm.cdf(x=-x_min[indx], loc=mu, scale=sigma)
         A_pow_mu *= tail_tot_prob
+
+        # Tail covariance matrix
+        tail_cov = self.compute_tail_covariance(mu_eff)
 
         results = np.zeros((3, n_portfolios))
         w = np.random.dirichlet(np.ones(self.n_assets), n_portfolios)
@@ -151,10 +155,13 @@ class ModernPortfolioTheory(fts):
             returns = self.sample_mixed_returns()
             returns = (1 + returns).prod(axis=1) - 1
             return_tot = w @ returns
-            log_tail_risks = np.log(np.sum((w ** mu_eff) * A_pow_mu, axis=1))
-            tail_scores = log_tail_risks - mu_eff * np.log(self.big_loss)
 
-            results[0, :] += log_tail_risks
+            uncorrelated_term = np.sum(w ** mu_eff * A_pow_mu, axis=1)
+            correlated_term = np.einsum('ki,ij,kj->k', (w ** mu_eff) ** 0.5, tail_cov, (w ** mu_eff) ** 0.5)
+            total_tail_risk = np.log(uncorrelated_term + correlated_term)
+            tail_scores = total_tail_risk - mu_eff * np.log(self.big_loss)
+
+            results[0, :] += total_tail_risk
             results[1, :] += return_tot
             results[2, :] += tail_scores
         results /= n_paths
@@ -162,7 +169,34 @@ class ModernPortfolioTheory(fts):
 
         return results, w[lowest_risk_indx, :], lowest_risk_indx
 
-    def compute_test_return(self, data_test: pd.DataFrame) -> np.float:
+    def compute_tail_covariance(self, mu_eff: float) -> np.ndarray:
+        """
+        Estimates the tail covariance matrix based on Bouchaud's formulation (§ 11.1.5).
+
+        Args:
+            mu_eff (float): Effective tail exponent (alpha_min - 1)
+
+        Returns:
+            np.ndarray: Tail covariance matrix
+        """
+        # Extreme events: left-tail thresholding
+        x_min = np.array([item[1] for _, item in self.alpha.loc["left"].items()])
+        extreme_mask = self.lin_returns.lt(-x_min).T  # Shape: (n_assets, n_days)
+
+        # Indicator for tail events (1 if in tail, 0 otherwise)
+        tail_events = extreme_mask.astype(float)
+
+        # Weighting by power-law scaling
+        A_mu = x_min ** mu_eff
+        scale = np.outer(A_mu, A_mu)
+
+        # Compute co-occurrence matrix of extreme events
+        co_events = np.cov(tail_events)
+        C_t = co_events * scale  # Elementwise scaling
+
+        return C_t
+
+    def compute_test_return(self, data_test: pd.DataFrame) -> float:
         """
         Computes the potential return on the test data using the w computed from the train data.
 

@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.stats import norm, lognorm, gaussian_kde
 import powerlaw
 import matplotlib.pyplot as plt
-import seaborn as sns
+from pandas.api.types import is_numeric_dtype
 
 class FatTailStock():
     """
@@ -63,6 +63,13 @@ class FatTailStock():
             raise ValueError("All prices must be positive")
         if self.data.isna().any().any():
             raise ValueError("Input data contains missing values.")
+        if not is_numeric_dtype(self.data.to_numpy()):
+            raise ValueError(f"Input data contains non-numeric values")
+        for col in self.data.columns:
+            try:
+                pd.to_numeric(self.data[col], errors='raise')
+            except (ValueError, TypeError):
+                raise ValueError(f"Column '{col}' contains non-numeric values")
 
     # Getter
     @property
@@ -287,7 +294,7 @@ class FatTailStock():
         """
         for ticker in self.tickers:
             lin_returns = self.lin_returns[ticker].dropna()
-            plt.style.use('seaborn-whitegrid')  # Use a clean grid style
+            plt.style.use('seaborn-v0_8-whitegrid')  # Use a clean grid style
             bins = 100  # Use the same number of bins for all subplots
 
             # Create subplots without sharing the y-axis

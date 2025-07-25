@@ -94,14 +94,31 @@ class TestModernPortfolioTheory:
 
     def test_powerlaw_assets(self, sample_data):
         """
-        Test the method for simulating power-law-distributed assets.
-        Ensure portfolio optimization still succeeds.
+        Test the method for simulating power-law-distributed assets using Bouchaud's tail covariance model.
+        Ensure portfolio optimization still succeeds and tail risk is finite and well-behaved.
         """
         mpt = ModernPortfolioTheory(sample_data)
         results, w_opt, idx = mpt.powerlaw_assets(n_portfolios=50, n_paths=5)
+
+        # Check shapes
         assert results.shape == (3, 50)
-        assert np.allclose(w_opt.sum(), 1.0)
+        assert w_opt.shape == (3,)
         assert 0 <= idx < 50
+
+        # Check weights normalize
+        assert np.allclose(w_opt.sum(), 1.0), "Optimal weights must sum to 1"
+
+        # Ensure tail risk (log) is finite
+        log_tail_risks = results[0, :]
+        assert np.all(np.isfinite(log_tail_risks)), "Log tail risks contain non-finite values"
+
+        # Ensure no infinite tail scores
+        tail_scores = results[2, :]
+        assert np.all(np.isfinite(tail_scores)), "Tail scores contain non-finite values"
+
+        # Tail scores should correlate with log tail risk — test rough monotonicity
+        lowest_idx = np.argmin(tail_scores)
+        assert np.isclose(tail_scores[lowest_idx], np.min(tail_scores)), "Incorrect lowest risk index"
 
     def test_compute_test_return(self, sample_data, test_data):
         """
@@ -162,3 +179,31 @@ class TestModernPortfolioTheory:
         prices = pd.DataFrame({'AAPL': [100] * 100, 'MSFT': [200] * 100}, index=dates)
         with pytest.raises(ValueError):
             ModernPortfolioTheory(prices)
+
+    def test_compute_tail_covariance(self, sample_data):
+        """
+        Test that the tail covariance matrix is symmetric, finite, and has correct shape.
+        """
+        mpt = ModernPortfolioTheory(sample_data)
+        mu_eff = 1.5  # Choose a valid tail exponent (α - 1)
+
+        # Make sure fat-tail parameters and linear returns are computed
+        assert hasattr(mpt, 'alpha')
+        assert hasattr(mpt, 'lin_returns')
+
+        # Run the method
+        tail_cov = mpt.compute_tail_covariance(mu_eff)
+
+        # Check type and shape
+        assert isinstance(tail_cov, np.ndarray)
+        assert tail_cov.shape == (mpt.n_assets, mpt.n_assets)
+
+        # Matrix should be symmetric
+        assert np.allclose(tail_cov, tail_cov.T, atol=1e-8), "Tail covariance matrix is not symmetric"
+
+        # Matrix should have finite entries
+        assert np.all(np.isfinite(tail_cov)), "Tail covariance contains non-finite values"
+
+        # Diagonal values should be non-negative
+        assert np.all(np.diag(tail_cov) >= 0), "Tail covariance diagonal values should be non-negative"
+

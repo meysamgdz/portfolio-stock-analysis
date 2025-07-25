@@ -1,8 +1,24 @@
+# Core Data & Statistics
 numpy
 pandas
-matplotlib
-yfinance
 scipy
-requests
+powerlaw
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
+# Machine Learning & Time Series
+scikit-learn
+xgboost
+keras
+tensorflow
+
+# Web Scraping & Data Fetching
 beautifulsoup4
-pytest
+requests
+yfinance
+
+# App Framework
+streamlit
