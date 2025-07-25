@@ -70,3 +70,12 @@ cd financial-portfolio-analysis
 ```
 2. Install the ``requirements.txt`` using the command: 
 ``pip install -r requirements.txt``.
+
+## How to run the app?
+
+1. Navigate to the project folder in the terminal.
+2. Run the folloing command:
+Run he command:
+```bash
+streamlit run app.py
+```
