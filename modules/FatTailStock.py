@@ -74,11 +74,17 @@ class FatTailStock():
     # Getter
     @property
     def data(self):
+        """Gets the variable value."""
         return self._data
 
     # Setter
     @data.setter
     def data(self, new_data):
+        """Sets the variable's new value.
+
+        Args:
+            new_data: The variable's new value.
+        """
         if not isinstance(new_data, pd.DataFrame):
             raise ValueError("Data must be a Pandas DataFrame!")
         self._data = new_data
@@ -178,8 +184,6 @@ class FatTailStock():
         for ticker in self.tickers:
             returns_neg = list(np.abs(returns[ticker][returns[ticker] < 0]))
             returns_pos = list(returns[ticker][returns[ticker] >= 0])
-            # fitted_powerlaw_left = powerlaw.Fit(returns_neg, xmin=np.mean(returns_neg))
-            # fitted_powerlaw_right = powerlaw.Fit(returns_pos, xmin=np.mean(returns_pos))
             fitted_powerlaw_left = powerlaw.Fit(returns_neg)
             fitted_powerlaw_right = powerlaw.Fit(returns_pos)
             power_law[ticker] = [fitted_powerlaw_left, fitted_powerlaw_right]
@@ -275,7 +279,7 @@ class FatTailStock():
             data (pd.Series | np.ndarray): Input data.
 
         Returns:
-            float: Mean absolute deviation.
+            Mean absolute deviation.
         """
         return np.mean(np.abs(data - np.mean(data)))
 
@@ -414,4 +418,5 @@ class FatTailStock():
             ax[1, 1].legend(fontsize=16)
 
             plt.tight_layout()
+
         return fig, ax

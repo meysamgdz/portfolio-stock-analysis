@@ -34,10 +34,8 @@ def get_fse_tickers() -> pd.DataFrame:
     """
     Retrieve a list of Frankfurt Stock Exchange tickers.
 
-    Checks for a local CSV file named 'tickers'. If not found, scrapes the listings from the DividendMax website.
-
     Returns:
-        pandas.DataFrame: A DataFrame with columns ['company', 'ticker'].
+        A DataFrame with columns ['company', 'ticker'].
     """
     filename = "tickers"
     if check_csv_file_exists(filename):

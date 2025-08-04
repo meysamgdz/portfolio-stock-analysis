@@ -40,11 +40,16 @@ class ModernPortfolioTheory(fts):
     # Getters
     @property
     def data_test(self):
+        """Gets the variables value."""
         return self._data_test
 
     # Setters
     @data_test.setter
     def data_test(self, new_data):
+        """Sets the variable to its new value.
+        Args:
+            new_data: Variable's new value.
+        """
         if not isinstance(new_data, pd.DataFrame):
             raise ValueError("Data must be a Pandas DataFrame!")
         self._data_test = new_data

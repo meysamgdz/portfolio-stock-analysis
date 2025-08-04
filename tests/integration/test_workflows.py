@@ -4,8 +4,6 @@ import pandas as pd
 
 from modules.FatTailStock import FatTailStock
 from modules.ModernPortfolioTheory import ModernPortfolioTheory
-
-
 @pytest.fixture
 def realistic_data():
     """Simulated fat-tailed price data for 3 assets."""

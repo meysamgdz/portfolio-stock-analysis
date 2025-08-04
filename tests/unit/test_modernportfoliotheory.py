@@ -4,7 +4,6 @@ import pandas as pd
 from modules.ModernPortfolioTheory import ModernPortfolioTheory
 
 class TestModernPortfolioTheory:
-
     @pytest.fixture
     def sample_data(self):
         """
