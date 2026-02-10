@@ -21,4 +21,4 @@ requests
 yfinance
 
 # App Framework
-streamlit
+streamlit>=1.32.0
